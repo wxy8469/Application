@@ -1,7 +1,7 @@
 package com.dawncos.android.home.utils;
 
-import com.dawncos.dcmodule.base.lifecycle.RxLifecycleUtils;
-import com.dawncos.dcmodule.base.mvp.IView;
+import com.dawncos.glutinousrice.base.mvp.IView;
+import com.dawncos.glutinousrice.utils.Rx.RxLifecycleUtil;
 import com.trello.rxlifecycle2.LifecycleTransformer;
 import com.trello.rxlifecycle2.RxLifecycle;
 
@@ -46,7 +46,7 @@ public class RxUtils {
                             public void run() {
                                 view.hideLoading();//隐藏进度条
                             }
-                        }).compose(RxLifecycleUtils.bindToLifecycle(view));
+                        }).compose(RxLifecycleUtil.bindToLifecycle(view));
             }
         };
     }
@@ -57,12 +57,12 @@ public class RxUtils {
      * @param view
      * @param <T>
      * @return
-     * @see RxLifecycleUtils 此类可以实现 {@link RxLifecycle} 的所有功能, 使用方法和之前一致
-     * @deprecated Use {@link RxLifecycleUtils#bindToLifecycle(IView)} instead
+     * @see RxLifecycleUtil 此类可以实现 {@link RxLifecycle} 的所有功能, 使用方法和之前一致
+     * @deprecated Use {@link RxLifecycleUtil#bindToLifecycle(IView)} instead
      */
     @Deprecated
     public static <T> LifecycleTransformer<T> bindToLifecycle(IView view) {
-        return RxLifecycleUtils.bindToLifecycle(view);
+        return RxLifecycleUtil.bindToLifecycle(view);
     }
 
 }

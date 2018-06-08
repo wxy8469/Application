@@ -8,19 +8,16 @@ import android.support.v4.app.FragmentManager;
 
 import com.dawncos.android.BuildConfig;
 import com.dawncos.android.mvp.model.api.Api;
-import com.dawncos.dcmodule.base.android.ModuleConfig;
-import com.dawncos.dcmodule.base.cache.IntelligentCache;
-import com.dawncos.dcmodule.base.dagger2.module.GlobalConfigModule;
-import com.dawncos.dcmodule.base.delegate.IAppDelegate;
-import com.dawncos.dcmodule.utils.android.ModuleUtils;
-import com.dawncos.dcmodule.utils.log.printer.DCMHttpLogPrinter;
+import com.dawncos.glutinousrice.base.android.ModuleConfig;
+import com.dawncos.glutinousrice.base.cache.IntelligentCache;
+import com.dawncos.glutinousrice.base.dagger2.module.GlobalConfigModule;
+import com.dawncos.glutinousrice.base.android.application.IAppLifecycle;
+import com.dawncos.glutinousrice.utils.android.ModuleUtil;
+import com.dawncos.glutinousrice.utils.log.printer.HttpLogPrinter;
 import com.squareup.leakcanary.RefWatcher;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import me.jessyan.progressmanager.ProgressManager;
-import me.jessyan.retrofiturlmanager.RetrofitUrlManager;
 
 /**
  * ================================================
@@ -35,13 +32,13 @@ public final class GlobalConfig implements ModuleConfig {
     @Override
     public void applyOptions(Context context, GlobalConfigModule.Builder builder) {
         if (!BuildConfig.LOG_DEBUG) { //Release 时,让框架不再打印 Http 请求和响应的信息
-            builder.printHttpLogLevel(DCMHttpLogPrinter.Level.NONE);
+            builder.printHttpLogLevel(HttpLogPrinter.Level.NONE);
         }
 
         builder.baseurl(Api.APP_DOMAIN)
                 //强烈建议自己自定义图片加载逻辑,因为默认提供的 GlideImageLoaderStrategy 并不能满足复杂的需求
                 //请参考 https://github.com/JessYanCoding/MVPArms/wiki#3.4
-//                .imageLoaderStrategy(new CustomLoaderStrategy())
+//               .imageLoaderStrategy(new CustomLoaderStrategy())
 
                 //想支持多 BaseUrl, 以及运行时动态切换任意一个 BaseUrl, 请使用 https://github.com/JessYanCoding/RetrofitUrlManager
                 //如果 BaseUrl 在 App 启动时不能确定, 需要请求服务器接口动态获取, 请使用以下代码
@@ -72,7 +69,7 @@ public final class GlobalConfig implements ModuleConfig {
 //                })
 
                 //若觉得框架默认的打印格式并不能满足自己的需求, 可自行扩展自己理想的打印格式 (以下只是简单实现)
-//                .formatPrinter(new FormatPrinter() {
+//                .formatPrinter(new FormatHttpMsg() {
 //                    @Override
 //                    public void printJsonRequest(Request request, String bodyString) {
 //                        Timber.i("printJsonRequest:" + bodyString);
@@ -110,10 +107,6 @@ public final class GlobalConfig implements ModuleConfig {
                 .okhttpConfiguration((context1, okhttpBuilder) -> {//这里可以自己自定义配置Okhttp的参数
 //                    okhttpBuilder.sslSocketFactory(); //支持 Https,详情请百度
                     okhttpBuilder.writeTimeout(10, TimeUnit.SECONDS);
-                    //使用一行代码监听 Retrofit／Okhttp 上传下载进度监听,以及 Glide 加载进度监听 详细使用方法查看 https://github.com/JessYanCoding/ProgressManager
-                    ProgressManager.getInstance().with(okhttpBuilder);
-                    //让 Retrofit 同时支持多个 BaseUrl 以及动态改变 BaseUrl. 详细使用请方法查看 https://github.com/JessYanCoding/RetrofitUrlManager
-                    RetrofitUrlManager.getInstance().with(okhttpBuilder);
                 })
                 .rxCacheConfiguration((context1, rxCacheBuilder) -> {//这里可以自己自定义配置 RxCache 的参数
                     rxCacheBuilder.useExpiredDataIfLoaderNotAvailable(true);
@@ -124,17 +117,17 @@ public final class GlobalConfig implements ModuleConfig {
     }
 
     @Override
-    public void expandApp(Context context, List<IAppDelegate> lifecycles) {
+    public void expandApp(Context context, List<IAppLifecycle> lifecycles) {
         // AppLifecycles的所有方法都会在基类Application的对应的生命周期中被调用,
         // 所以在对应的方法中可以扩展一些自己需要的逻辑 可以根据不同的逻辑添加多个实现类
-        lifecycles.add(new ExAppDelegate());
+        lifecycles.add(new ExAppLifecycle());
     }
 
     @Override
     public void expandActivity(Context context, List<Application.ActivityLifecycleCallbacks> lifecycles) {
         // ActivityLifecycleCallbacks的所有方法都会在Activity(包括三方库)的对应的生命周期中被调用,
         // 所以在对应的方法中可以扩展一些自己需要的逻辑 可以根据不同的逻辑添加多个实现类
-        lifecycles.add(new DCActivityLifecycleCallbacks());
+        lifecycles.add(new ExActivityLifecycle());
     }
 
     @Override
@@ -152,7 +145,7 @@ public final class GlobalConfig implements ModuleConfig {
 
             @Override
             public void onFragmentDestroyed(FragmentManager fm, Fragment f) {
-                ((RefWatcher) ModuleUtils
+                ((RefWatcher) ModuleUtil
                         .getAppComponent(f.getActivity())
                         .extras()
                         .get(IntelligentCache.KEY_KEEP + RefWatcher.class.getName()))

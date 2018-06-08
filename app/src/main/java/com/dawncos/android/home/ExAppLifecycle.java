@@ -5,10 +5,12 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.dawncos.android.BuildConfig;
-import com.dawncos.dcmodule.base.cache.IntelligentCache;
-import com.dawncos.dcmodule.base.dagger2.component.AppComponent;
-import com.dawncos.dcmodule.base.delegate.IAppDelegate;
-import com.dawncos.dcmodule.utils.android.ModuleUtils;
+import com.dawncos.glutinousrice.base.android.application.IAppLifecycle;
+import com.dawncos.glutinousrice.base.cache.IntelligentCache;
+import com.dawncos.glutinousrice.base.dagger2.component.AppComponent;
+import com.dawncos.glutinousrice.utils.android.ModuleUtil;
+import com.dawncos.glutinousrice.utils.log.timber.CrashReportingTree;
+import com.dawncos.glutinousrice.utils.log.timber.DebugLogTree;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -17,19 +19,19 @@ import timber.log.Timber;
 
 /**
  * ================================================
- * 展示 {@link IAppDelegate} 的用法
+ * 展示 {@link IAppLifecycle} 的用法
  *
  * Created by wxy8469
  * <a href="mailto:wxy8469163@gmail.com">Contact me</a>
  * <a href="https://github.com/wxy8469/Application">Follow me</a>
  * ================================================
  */
-public class ExAppDelegate implements IAppDelegate {
+public class ExAppLifecycle implements IAppLifecycle {
     private Application application;
 
     @Override
     public void attachBaseContext(@NonNull Context base) {
-//          MultiDex.install(base);  //这里比 onCreate 先执行,常用于 MultiDex 初始化,插件化框架的初始化
+//          MultiDex.install(base);
     }
 
     @Override
@@ -40,21 +42,15 @@ public class ExAppDelegate implements IAppDelegate {
             // You should not init your app in this process.
             return;
         }
-        if (BuildConfig.LOG_DEBUG) {//Timber初始化
-            //Timber 是一个日志框架容器,外部使用统一的Api,内部可以动态的切换成任何日志框架(打印策略)进行日志打印
-            //并且支持添加多个日志框架(打印策略),做到外部调用一次 Api,内部却可以做到同时使用多个策略
-            //比如添加三个策略,一个打印日志,一个将日志保存本地,一个将日志上传服务器
-            Timber.plant(new Timber.DebugTree());
-            // 如果你想将框架切换为 Logger 来打印日志,请使用下面的代码,如想切换为其他日志框架请根据下面的方式扩展
-//                    Logger.addLogAdapter(new AndroidLogAdapter());
-//                    Timber.plant(new Timber.DebugTree() {
-//                        @Override
-//                        protected void log(int priority, String tag, String message, Throwable t) {
-//                            Logger.log(priority, tag, message, t);
-//                        }
-//                    });
+        if (BuildConfig.LOG_DEBUG) {
+//            Timber.plant(new FileLogTree());
+            Timber.plant(new DebugLogTree());
             ButterKnife.setDebug(true);
+        } else {
+//            Timber.plant(new ReleaseLogTree());
+            Timber.plant(new CrashReportingTree());
         }
+        Timber.d( "onCreate");
         //LeakCanary 内存泄露检查
         //使用 IntelligentCache.KEY_KEEP 作为 key 的前缀, 可以使储存的数据永久存储在内存中
         //否则存储在 LRU 算法的存储空间中, 前提是 extras 使用的是 IntelligentCache (框架默认使用)
@@ -76,11 +72,12 @@ public class ExAppDelegate implements IAppDelegate {
 
     @Override
     public void onTerminate(@NonNull Application application) {
-
+        Timber.d( "onTerminate");
     }
 
     @Override
     public AppComponent getAppComponent() {
-        return ModuleUtils.getAppComponent(application);
+        Timber.d( "getAppComponent");
+        return ModuleUtil.getAppComponent(application);
     }
 }

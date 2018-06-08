@@ -5,8 +5,8 @@ import android.view.View;
 import com.dawncos.android.R;
 import com.dawncos.android.home.holder.UserItemHolder;
 import com.dawncos.android.mvp.model.entity.User;
-import com.dawncos.dcmodule.base.android.adapter.BaseHolder;
-import com.dawncos.dcmodule.base.android.adapter.DefaultAdapter;
+import com.dawncos.glutinousrice.base.android.adapter.BaseHolder;
+import com.dawncos.glutinousrice.base.android.adapter.DefaultAdapter;
 
 import java.util.List;
 

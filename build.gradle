@@ -6,9 +6,14 @@ buildscript {
         maven {
             url 'https://maven.google.com'
         }
+        maven {
+            url 'https://maven.fabric.io/public'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath 'com.google.gms:google-services:4.0.0'
+        classpath 'io.fabric.tools:gradle:1.25.1'
         //Gradle Android Maven plugin
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
         //Gradle Bintray Plugin

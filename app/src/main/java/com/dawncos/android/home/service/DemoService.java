@@ -1,7 +1,7 @@
 package com.dawncos.android.home.service;
 
 
-import com.dawncos.dcmodule.base.android.BaseService;
+import com.dawncos.glutinousrice.base.android.service.BaseService;
 
 /**
  * ================================================

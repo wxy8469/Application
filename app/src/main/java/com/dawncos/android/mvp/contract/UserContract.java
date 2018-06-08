@@ -3,8 +3,8 @@ package com.dawncos.android.mvp.contract;
 import android.app.Activity;
 
 import com.dawncos.android.mvp.model.entity.User;
-import com.dawncos.dcmodule.base.mvp.IModel;
-import com.dawncos.dcmodule.base.mvp.IView;
+import com.dawncos.glutinousrice.base.mvp.IModel;
+import com.dawncos.glutinousrice.base.mvp.IView;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.List;

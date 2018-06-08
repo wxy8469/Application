@@ -20,16 +20,16 @@ import timber.log.Timber;
  * <a href="https://github.com/JessYanCoding">Follow me</a>
  * ================================================
  */
-public class DCActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+public class ExActivityLifecycle implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        Timber.w(activity + " - onActivityCreated");
+        Timber.d(" - onActivityCreated");
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
-        Timber.w(activity + " - onActivityStarted");
+        Timber.d(" - onActivityStarted");
         if (!activity.getIntent().getBooleanExtra("isInitToolbar", false)) {
             //由于加强框架的兼容性,故将 setContentView 放到 onActivityCreated 之后,onActivityStarted 之前执行
             //而 findViewById 必须在 Activity setContentView() 后才有效,所以将以下代码从之前的 onActivityCreated 中移动到 onActivityStarted 中执行
@@ -59,7 +59,7 @@ public class DCActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityResumed(Activity activity) {
-        Timber.w(activity + " - onActivityResumed");
+        Timber.d(" - onActivityResumed");
     }
 
     @Override
@@ -69,17 +69,17 @@ public class DCActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityStopped(Activity activity) {
-        Timber.w(activity + " - onActivityStopped");
+        Timber.d(" - onActivityStopped");
     }
 
     @Override
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-        Timber.w(activity + " - onActivitySaveInstanceState");
+        Timber.d(" - onActivitySaveInstanceState");
     }
 
     @Override
     public void onActivityDestroyed(Activity activity) {
-        Timber.w(activity + " - onActivityDestroyed");
+        Timber.d(" - onActivityDestroyed");
         //横竖屏切换或配置改变时, Activity 会被重新创建实例, 但 Bundle 中的基础数据会被保存下来,移除该数据是为了保证重新创建的实例可以正常工作
         activity.getIntent().removeExtra("isInitToolbar");
     }

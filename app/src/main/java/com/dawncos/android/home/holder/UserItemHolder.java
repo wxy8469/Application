@@ -4,13 +4,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.dawncos.glutinousrice.http.imageloader.glide.GlideImageConfig;
 import com.dawncos.android.R;
 import com.dawncos.android.mvp.model.entity.User;
-import com.dawncos.dcmodule.base.android.adapter.BaseHolder;
-import com.dawncos.dcmodule.base.dagger2.component.AppComponent;
-import com.dawncos.dcmodule.http.imageloader.ImageLoader;
-import com.dawncos.dcmodule.http.imageloader.glide.DCMImageConfig;
-import com.dawncos.dcmodule.utils.android.ModuleUtils;
+import com.dawncos.glutinousrice.base.android.adapter.BaseHolder;
+import com.dawncos.glutinousrice.base.dagger2.component.AppComponent;
+import com.dawncos.glutinousrice.http.imageloader.ImageLoader;
+import com.dawncos.glutinousrice.utils.android.ModuleUtil;
 
 import butterknife.BindView;
 import io.reactivex.Observable;
@@ -36,7 +36,7 @@ public class UserItemHolder extends BaseHolder<User> {
     public UserItemHolder(View itemView) {
         super(itemView);
         //可以在任何可以拿到 Context 的地方,拿到 AppComponent,从而得到用 Dagger 管理的单例对象
-        mAppComponent = ModuleUtils.getAppComponent(itemView.getContext());
+        mAppComponent = ModuleUtil.getAppComponent(itemView.getContext());
         mImageLoader = mAppComponent.imageLoader();
     }
 
@@ -47,7 +47,7 @@ public class UserItemHolder extends BaseHolder<User> {
 
         //itemView 的 Context 就是 Activity, Glide 会自动处理并和该 Activity 的生命周期绑定
         mImageLoader.loadImage(itemView.getContext(),
-                DCMImageConfig
+                GlideImageConfig
                         .builder()
                         .url(data.getAvatarUrl())
                         .imageView(mAvatar)
@@ -57,7 +57,7 @@ public class UserItemHolder extends BaseHolder<User> {
 
     @Override
     protected void onRelease() {
-        mImageLoader.clear(mAppComponent.application(), DCMImageConfig.builder()
+        mImageLoader.clear(mAppComponent.application(), GlideImageConfig.builder()
                 .imageViews(mAvatar)
                 .build());
     }

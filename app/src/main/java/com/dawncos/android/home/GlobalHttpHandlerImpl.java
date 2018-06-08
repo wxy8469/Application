@@ -4,9 +4,9 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.dawncos.android.mvp.model.entity.User;
-import com.dawncos.dcmodule.http.GlobalHttpHandler;
-import com.dawncos.dcmodule.utils.android.ModuleUtils;
-import com.dawncos.dcmodule.utils.log.printer.DCMHttpLogPrinter;
+import com.dawncos.glutinousrice.http.GlobalHttpHandler;
+import com.dawncos.glutinousrice.utils.android.ModuleUtil;
+import com.dawncos.glutinousrice.utils.log.printer.HttpLogPrinter;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
@@ -37,9 +37,9 @@ public class GlobalHttpHandlerImpl implements GlobalHttpHandler {
                     /* 这里可以先客户端一步拿到每一次http请求的结果,可以解析成json,做一些操作,如检测到token过期后
                        重新请求token,并重新执行请求 */
 
-        if (!TextUtils.isEmpty(httpResult) && DCMHttpLogPrinter.isJson(response.body().contentType())) {
+        if (!TextUtils.isEmpty(httpResult) && HttpLogPrinter.isJson(response.body().contentType())) {
             try {
-                List<User> list = ModuleUtils.getAppComponent(context).gson().fromJson(httpResult, new TypeToken<List<User>>() {}.getType());
+                List<User> list = ModuleUtil.getAppComponent(context).gson().fromJson(httpResult, new TypeToken<List<User>>() {}.getType());
                 User user = list.get(0);
                 Timber.w("Result ------> " + user.getLogin() + "    ||   Avatar_url------> " + user.getAvatarUrl());
             } catch (Exception e) {

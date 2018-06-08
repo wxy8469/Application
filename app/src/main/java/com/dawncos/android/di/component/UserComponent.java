@@ -2,8 +2,8 @@ package com.dawncos.android.di.component;
 
 import com.dawncos.android.home.activity.UserActivity;
 import com.dawncos.android.di.module.UserModule;
-import com.dawncos.dcmodule.base.dagger2.component.AppComponent;
-import com.dawncos.dcmodule.base.dagger2.scope.ActivityScope;
+import com.dawncos.glutinousrice.base.dagger2.component.AppComponent;
+import com.dawncos.glutinousrice.base.dagger2.scope.ActivityScope;
 
 import dagger.Component;
 

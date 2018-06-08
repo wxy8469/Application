@@ -13,10 +13,10 @@ import com.dawncos.android.di.component.DaggerUserComponent;
 import com.dawncos.android.di.module.UserModule;
 import com.dawncos.android.mvp.contract.UserContract;
 import com.dawncos.android.mvp.presenter.UserPresenter;
-import com.dawncos.dcmodule.base.android.BaseActivity;
-import com.dawncos.dcmodule.base.android.adapter.DefaultAdapter;
-import com.dawncos.dcmodule.base.dagger2.component.AppComponent;
-import com.dawncos.dcmodule.utils.android.ModuleUtils;
+import com.dawncos.glutinousrice.base.android.activity.BaseActivity;
+import com.dawncos.glutinousrice.base.android.adapter.DefaultAdapter;
+import com.dawncos.glutinousrice.base.dagger2.component.AppComponent;
+import com.dawncos.glutinousrice.utils.android.ModuleUtil;
 import com.paginate.Paginate;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -25,7 +25,8 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import timber.log.Timber;
 
-public class UserActivity extends BaseActivity<UserPresenter> implements UserContract.View, SwipeRefreshLayout.OnRefreshListener {
+public class UserActivity extends BaseActivity<UserPresenter>
+        implements UserContract.View, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
@@ -42,7 +43,14 @@ public class UserActivity extends BaseActivity<UserPresenter> implements UserCon
     private boolean isLoadingMore;
 
     @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Timber.d("-------onCreate");
+        super.onCreate(savedInstanceState);
+    }//测试 BehaviorSubject
+
+    @Override
     public void setupActivityComponent(@NonNull AppComponent appComponent) {
+        Timber.d("setupActivityComponent");
         DaggerUserComponent
                 .builder()
                 .appComponent(appComponent)
@@ -53,11 +61,13 @@ public class UserActivity extends BaseActivity<UserPresenter> implements UserCon
 
     @Override
     public int initView(@Nullable Bundle savedInstanceState) {
+        Timber.d("initView");
         return R.layout.activity_user;
     }
 
     @Override
     public void initData(@Nullable Bundle savedInstanceState) {
+        Timber.d("initData");
         initRecyclerView();
         mRecyclerView.setAdapter(mAdapter);
         initPaginate();
@@ -66,6 +76,7 @@ public class UserActivity extends BaseActivity<UserPresenter> implements UserCon
 
     @Override
     public void onRefresh() {
+        Timber.d("onRefresh");
         mPresenter.requestUsers(true);
     }
 
@@ -73,31 +84,33 @@ public class UserActivity extends BaseActivity<UserPresenter> implements UserCon
      * 初始化RecyclerView
      */
     private void initRecyclerView() {
+        Timber.d("initRecyclerView");
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        ModuleUtils.configRecyclerView(mRecyclerView, mLayoutManager);
+        ModuleUtil.configRecyclerView(mRecyclerView, mLayoutManager);
     }
 
 
     @Override
     public void showLoading() {
-        Timber.tag(TAG).w("showLoading");
+        Timber.d("showLoading");
         mSwipeRefreshLayout.setRefreshing(true);
     }
 
     @Override
     public void hideLoading() {
-        Timber.tag(TAG).w("hideLoading");
+        Timber.d("hideLoading");
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void showMessage(String message) {
-        ModuleUtils.snackbarText(message);
+        Timber.d("showMessage");
+        ModuleUtil.snackbarText(message);
     }
 
     @Override
     public void launchActivity(Intent intent) {
-        ModuleUtils.startActivity(intent);
+        ModuleUtil.startActivity(intent);
     }
 
     @Override
@@ -135,6 +148,7 @@ public class UserActivity extends BaseActivity<UserPresenter> implements UserCon
      * 初始化Paginate,用于加载更多
      */
     private void initPaginate() {
+        Timber.d("initPaginate");
         if (mPaginate == null) {
             Paginate.Callbacks callbacks = new Paginate.Callbacks() {
                 @Override
@@ -166,5 +180,10 @@ public class UserActivity extends BaseActivity<UserPresenter> implements UserCon
         super.onDestroy();
         this.mRxPermissions = null;
         this.mPaginate = null;
+    }
+
+    @Override
+    public boolean useEventBus() {
+        return false;
     }
 }

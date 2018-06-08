@@ -3,6 +3,7 @@ package com.dawncos.android.mvp.presenter;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.OnLifecycleEvent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.SupportActivity;
@@ -10,11 +11,11 @@ import android.support.v7.widget.RecyclerView;
 
 import com.dawncos.android.mvp.contract.UserContract;
 import com.dawncos.android.mvp.model.entity.User;
-import com.dawncos.dcmodule.base.dagger2.scope.ActivityScope;
-import com.dawncos.dcmodule.base.lifecycle.RxLifecycleUtils;
-import com.dawncos.dcmodule.base.mvp.BasePresenter;
-import com.dawncos.dcmodule.utils.Rx.DCMPermission;
-import com.dawncos.dcmodule.utils.android.AppManager;
+import com.dawncos.glutinousrice.base.dagger2.scope.ActivityScope;
+import com.dawncos.glutinousrice.base.mvp.BasePresenter;
+import com.dawncos.glutinousrice.utils.Rx.RxLifecycleUtil;
+import com.dawncos.glutinousrice.utils.Rx.RxPermissionsUtil;
+import com.dawncos.glutinousrice.utils.android.AppManager;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 @ActivityScope
 public class UserPresenter extends BasePresenter<UserContract.Model, UserContract.View> {
@@ -49,13 +51,15 @@ public class UserPresenter extends BasePresenter<UserContract.Model, UserContrac
      */
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     void onCreate() {
+        Timber.d("onCreate");
         requestUsers(true);//打开 App 时自动加载列表
     }
 
     @SuppressLint("CheckResult")
     public void requestUsers(final boolean pullToRefresh) {
+        Timber.d("requestUsers");
         //请求外部存储权限用于适配android6.0的权限管理机制
-        DCMPermission.externalStorage(new DCMPermission.PermissionListener(){
+        RxPermissionsUtil.externalStorage(new RxPermissionsUtil.PermissionListener(){
 
             @Override
             public void onPermissionApplied() {
@@ -105,7 +109,7 @@ public class UserPresenter extends BasePresenter<UserContract.Model, UserContrac
                     else
                         mRootView.endLoadMore();//隐藏上拉加载更多的进度条
                 })
-                .compose(RxLifecycleUtils.bindToLifecycle(mRootView))//使用 Rxlifecycle,使 Disposable 和 Activity 一起销毁
+                .compose(RxLifecycleUtil.bindToLifecycle(mRootView))//解决RxJava内存泄漏
                 .subscribe((List<User> users) -> {
                     lastUserId = users.get(users.size() - 1).getId();//记录最后一个id,用于下一次请求
                     if (pullToRefresh) mUsers.clear();//如果是下拉刷新则清空列表
@@ -120,8 +124,7 @@ public class UserPresenter extends BasePresenter<UserContract.Model, UserContrac
 
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroy(LifecycleOwner owner) {
         this.mAdapter = null;
         this.mUsers = null;
         this.mAppManager = null;

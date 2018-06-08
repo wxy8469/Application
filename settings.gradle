@@ -1,1 +1,1 @@
-include ':app', ':cmodule'
+include ':app', ':glutinousrice'

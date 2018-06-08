@@ -7,7 +7,7 @@ import com.dawncos.android.home.adapter.UserAdapter;
 import com.dawncos.android.mvp.contract.UserContract;
 import com.dawncos.android.mvp.model.UserModel;
 import com.dawncos.android.mvp.model.entity.User;
-import com.dawncos.dcmodule.base.dagger2.scope.ActivityScope;
+import com.dawncos.glutinousrice.base.dagger2.scope.ActivityScope;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.ArrayList;

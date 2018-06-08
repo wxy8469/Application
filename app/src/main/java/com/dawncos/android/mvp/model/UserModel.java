@@ -7,9 +7,9 @@ import com.dawncos.android.mvp.contract.UserContract;
 import com.dawncos.android.mvp.model.api.cache.CommonCache;
 import com.dawncos.android.mvp.model.api.service.UserService;
 import com.dawncos.android.mvp.model.entity.User;
-import com.dawncos.dcmodule.base.android.IRepositoryManager;
-import com.dawncos.dcmodule.base.dagger2.scope.ActivityScope;
-import com.dawncos.dcmodule.base.mvp.BaseModel;
+import com.dawncos.glutinousrice.base.android.repository.IRepositoryManager;
+import com.dawncos.glutinousrice.base.dagger2.scope.ActivityScope;
+import com.dawncos.glutinousrice.base.mvp.BaseModel;
 
 import java.util.List;
 
@@ -44,6 +44,7 @@ public class UserModel extends BaseModel implements UserContract.Model {
 
     @Override
     public Observable<List<User>> getUsers(int lastIdQueried, boolean update) {
+        Timber.d("getUsers");
         //使用rxcache缓存,上拉刷新则不读取缓存,加载更多读取缓存
         return Observable.just(mRepositoryManager
                 .obtainRetrofitService(UserService.class)
