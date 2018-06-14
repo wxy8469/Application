@@ -10,10 +10,10 @@ import com.dawncos.android.BuildConfig;
 import com.dawncos.android.mvp.model.api.Api;
 import com.dawncos.glutinousrice.base.android.ModuleConfig;
 import com.dawncos.glutinousrice.base.cache.IntelligentCache;
-import com.dawncos.glutinousrice.base.dagger2.module.GlobalConfigModule;
+import com.dawncos.glutinousrice.base.dagger2.module.ConfigModule;
 import com.dawncos.glutinousrice.base.android.application.IAppLifecycle;
 import com.dawncos.glutinousrice.utils.android.ModuleUtil;
-import com.dawncos.glutinousrice.utils.log.printer.HttpLogPrinter;
+import com.dawncos.glutinousrice.utils.log.interceptor.HttpLogInterceptor;
 import com.squareup.leakcanary.RefWatcher;
 
 import java.util.List;
@@ -27,12 +27,12 @@ import java.util.concurrent.TimeUnit;
  * <a href="https://github.com/wxy8469/Application">Follow me</a>
  * ================================================
  */
-public final class GlobalConfig implements ModuleConfig {
+public final class AppConfig implements ModuleConfig {
 
     @Override
-    public void applyOptions(Context context, GlobalConfigModule.Builder builder) {
+    public void applyOptions(Context context, ConfigModule.Builder builder) {
         if (!BuildConfig.LOG_DEBUG) { //Release 时,让框架不再打印 Http 请求和响应的信息
-            builder.printHttpLogLevel(HttpLogPrinter.Level.NONE);
+            builder.printHttpLogLevel(HttpLogInterceptor.Level.NONE);
         }
 
         builder.baseurl(Api.APP_DOMAIN)
@@ -43,7 +43,7 @@ public final class GlobalConfig implements ModuleConfig {
                 //想支持多 BaseUrl, 以及运行时动态切换任意一个 BaseUrl, 请使用 https://github.com/JessYanCoding/RetrofitUrlManager
                 //如果 BaseUrl 在 App 启动时不能确定, 需要请求服务器接口动态获取, 请使用以下代码
                 //以下方式是 Arms 框架自带的切换 BaseUrl 的方式, 在整个 App 生命周期内只能切换一次, 若需要无限次的切换 BaseUrl, 以及各种复杂的应用场景还是需要使用 RetrofitUrlManager 框架
-                //以下代码只是配置, 还要使用 Okhttp (AppComponent中提供) 请求服务器获取到正确的 BaseUrl 后赋值给 GlobalConfig.sDomain
+                //以下代码只是配置, 还要使用 Okhttp (AppComponent中提供) 请求服务器获取到正确的 BaseUrl 后赋值给 AppConfig.sDomain
                 //切记整个过程必须在第一次调用 Retrofit 接口之前完成, 如果已经调用过 Retrofit 接口, 此种方式将不能切换 BaseUrl
 //                .baseurl(new BaseUrl() {
 //                    @Override
@@ -58,7 +58,7 @@ public final class GlobalConfig implements ModuleConfig {
 //                    @Override
 //                    public Cache build(CacheType type) {
 //                        switch (type.getCacheTypeId()){
-//                            case CacheType.EXTRAS_TYPE_ID:
+//                            case CacheType.CACHE_TYPE_ID:
 //                                return new IntelligentCache(500);
 //                            case CacheType.CACHE_SERVICE_CACHE_TYPE_ID:
 //                                return new Cache(type.calculateCacheSize(context));//自定义 Cache
@@ -95,24 +95,23 @@ public final class GlobalConfig implements ModuleConfig {
 //                })
 
                 // 这里提供一个全局处理 Http 请求和响应结果的处理类,可以比客户端提前一步拿到服务器返回的结果,可以做一些操作,比如token超时,重新获取
-                .globalHttpHandler(new GlobalHttpHandlerImpl(context))
-                .gsonConfiguration((context1, gsonBuilder) -> {//这里可以自己自定义配置Gson的参数
+                .httpHandler(new HttpHandlerImpl(context))
+                .gson((context1, gsonBuilder) -> {//这里可以自己自定义配置Gson的参数
                     gsonBuilder
                             .serializeNulls()//支持序列化null的参数
                             .enableComplexMapKeySerialization();//支持将序列化key为object的map,默认只能序列化key为string的map
                 })
-                .retrofitConfiguration((context1, retrofitBuilder) -> {//这里可以自己自定义配置Retrofit的参数,甚至你可以替换系统配置好的okhttp对象
+                .retrofit((context1, retrofitBuilder) -> {//这里可以自己自定义配置Retrofit的参数,甚至你可以替换系统配置好的okhttp对象
 //                    retrofitBuilder.addConverterFactory(FastJsonConverterFactory.create());//比如使用fastjson替代gson
                 })
-                .okhttpConfiguration((context1, okhttpBuilder) -> {//这里可以自己自定义配置Okhttp的参数
+                .okHttpClient((context1, okhttpBuilder) -> {//这里可以自己自定义配置Okhttp的参数
 //                    okhttpBuilder.sslSocketFactory(); //支持 Https,详情请百度
                     okhttpBuilder.writeTimeout(10, TimeUnit.SECONDS);
                 })
-                .rxCacheConfiguration((context1, rxCacheBuilder) -> {//这里可以自己自定义配置 RxCache 的参数
+                .rxCache((context1, rxCacheBuilder) -> {//这里可以自己自定义配置 RxCache 的参数
                     rxCacheBuilder.useExpiredDataIfLoaderNotAvailable(true);
                     // 想自定义 RxCache 的缓存文件夹或者解析方式, 如改成 fastjson, 请 return rxCacheBuilder.persistence(cacheDirectory, new FastJsonSpeaker());
                     // 否则请 return null;
-                    return null;
                 });
     }
 
@@ -147,7 +146,7 @@ public final class GlobalConfig implements ModuleConfig {
             public void onFragmentDestroyed(FragmentManager fm, Fragment f) {
                 ((RefWatcher) ModuleUtil
                         .getAppComponent(f.getActivity())
-                        .extras()
+                        .cache()
                         .get(IntelligentCache.KEY_KEEP + RefWatcher.class.getName()))
                         .watch(f);
             }

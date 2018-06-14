@@ -94,22 +94,25 @@ public class UserPresenter extends BasePresenter<UserContract.Model, UserContrac
             isEvictCache = false;
         }
 
+
+
         mModel.getUsers(lastUserId, isEvictCache)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())//subscribeOn() 用来确定数据发射所在的线程，位置放在哪里都可以，但它是只能调用一次的。
                 .doOnSubscribe(disposable -> {
                     if (pullToRefresh)
                         mRootView.showLoading();//显示下拉刷新的进度条
                     else
                         mRootView.startLoadMore();//显示上拉加载更多的进度条
-                }).subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread())
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())//可以调用多次来切换线程，observeOn 决定他下面的方法执行时所在的线程。
                 .doFinally(() -> {
                     if (pullToRefresh)
                         mRootView.hideLoading();//隐藏下拉刷新的进度条
                     else
                         mRootView.endLoadMore();//隐藏上拉加载更多的进度条
                 })
-                .compose(RxLifecycleUtil.bindToLifecycle(mRootView))//解决RxJava内存泄漏
+                .compose(RxLifecycleUtil.bindToLifecycle(mRootView))//解决RxJava内存泄漏,添加compose(this.<Long>bindToLifecycle()) 当Activity结束掉以后，Observable停止发送数据，订阅关系解除。
                 .subscribe((List<User> users) -> {
                     lastUserId = users.get(users.size() - 1).getId();//记录最后一个id,用于下一次请求
                     if (pullToRefresh) mUsers.clear();//如果是下拉刷新则清空列表
