@@ -12,7 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:background="@drawable/img_default_welcome"/>
+            android:background="@mipmap/img_default_welcome"/>
 
         <TextView
             android:id="@+id/tv_jump"

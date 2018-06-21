@@ -59,7 +59,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private void launchActivity() {
         Intent intent = new Intent(this, UserActivity.class);
         startActivity(intent);
-        overridePendingTransition(R.anim.screen_zoom_in, R.anim.screen_zoom_out);
+        overridePendingTransition(R.anim.translate_left_to_center, R.anim.translate_right_to_center);
         finish();
     }
 
