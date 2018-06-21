@@ -9,7 +9,6 @@ import com.dawncos.glutinousrice.base.android.application.IAppLifecycle;
 import com.dawncos.glutinousrice.base.cache.IntelligentCache;
 import com.dawncos.glutinousrice.base.dagger2.component.AppComponent;
 import com.dawncos.glutinousrice.utils.android.ModuleUtil;
-import com.dawncos.glutinousrice.utils.log.timber.CrashReportingTree;
 import com.dawncos.glutinousrice.utils.log.timber.DebugLogTree;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
@@ -31,6 +30,7 @@ public class ExAppLifecycle implements IAppLifecycle {
 
     @Override
     public void attachBaseContext(@NonNull Context base) {
+        //MultiDex 以及插件化框架的初始化
 //          MultiDex.install(base);
     }
 
@@ -48,7 +48,7 @@ public class ExAppLifecycle implements IAppLifecycle {
             ButterKnife.setDebug(true);
         } else {
 //            Timber.plant(new ReleaseLogTree());
-            Timber.plant(new CrashReportingTree());
+//            Timber.plant(new CrashReportingTree());
         }
         Timber.d( "onCreate");
         //LeakCanary 内存泄露检查
@@ -56,7 +56,7 @@ public class ExAppLifecycle implements IAppLifecycle {
         //否则存储在 LRU 算法的存储空间中, 前提是 cache 使用的是 IntelligentCache (框架默认使用)
         getAppComponent().cache().put(IntelligentCache.KEY_KEEP + RefWatcher.class.getName(),
                 BuildConfig.USE_CANARY ? LeakCanary.install(application) : RefWatcher.DISABLED);
-        //扩展 AppManager 的远程遥控功能
+        //扩展 ActivityHelper 的远程遥控功能
         getAppComponent().appManager().setHandleListener((appManager, message) -> {
             switch (message.what) {
                 //case 0:
@@ -67,7 +67,7 @@ public class ExAppLifecycle implements IAppLifecycle {
         //Usage:
         //Message msg = new Message();
         //msg.what = 0;
-        //AppManager.post(msg); like EventBus
+        //ActivityHelper.post(msg); like EventBus
     }
 
     @Override

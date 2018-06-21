@@ -15,7 +15,7 @@ import com.dawncos.glutinousrice.base.dagger2.scope.ActivityScope;
 import com.dawncos.glutinousrice.base.mvp.BasePresenter;
 import com.dawncos.glutinousrice.utils.Rx.RxLifecycleUtil;
 import com.dawncos.glutinousrice.utils.Rx.RxPermissionsUtil;
-import com.dawncos.glutinousrice.utils.android.AppManager;
+import com.dawncos.glutinousrice.utils.android.ActivityHelper;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import timber.log.Timber;
 @ActivityScope
 public class UserPresenter extends BasePresenter<UserContract.Model, UserContract.View> {
     @Inject
-    AppManager mAppManager;
+    ActivityHelper mActivityHelper;
     @Inject
     Application mApplication;
     @Inject
@@ -130,7 +130,7 @@ public class UserPresenter extends BasePresenter<UserContract.Model, UserContrac
     public void onDestroy(LifecycleOwner owner) {
         this.mAdapter = null;
         this.mUsers = null;
-        this.mAppManager = null;
+        this.mActivityHelper = null;
         this.mApplication = null;
     }
 }

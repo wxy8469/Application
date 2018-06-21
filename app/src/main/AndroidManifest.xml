@@ -18,11 +18,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".home.activity.UserActivity">
+            android:name=".home.activity.WelcomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/ViewBigPicTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".home.activity.UserActivity">
         </activity>
         <activity
             android:name=".home.activity.LoginActivity">
@@ -40,8 +46,8 @@
 
         <!-- APP配置 -->
         <meta-data
-            android:name="com.dawncos.android.home.AppConfig"
-            android:value="APP_CONFIG"/>
+            android:name="com.dawncos.android.home.AppGlutinousRice"
+            android:value="GLUTINOUSRICE_MODULE"/>
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
